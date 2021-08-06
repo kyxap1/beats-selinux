@@ -1,0 +1,46 @@
+policy_module(filebeat, 1.0.0)
+
+type filebeat_t;
+type filebeat_exec_t;
+init_daemon_domain(filebeat_t, filebeat_exec_t)
+
+type filebeat_initrc_exec_t;
+init_script_file(filebeat_initrc_exec_t)
+
+type filebeat_log_t;
+logging_log_file(filebeat_log_t)
+
+type filebeat_var_lib_t;
+files_type(filebeat_var_lib_t)
+
+type filebeat_unit_file_t;
+systemd_unit_file(filebeat_unit_file_t)
+
+allow filebeat_t self:fifo_file rw_fifo_file_perms;
+allow filebeat_t self:unix_stream_socket create_stream_socket_perms;
+allow filebeat_t self:capability { dac_override dac_read_search };
+dontaudit filebeat_t self:capability sys_ptrace;
+
+manage_dirs_pattern(filebeat_t, filebeat_log_t, filebeat_log_t)
+manage_files_pattern(filebeat_t, filebeat_log_t, filebeat_log_t)
+manage_lnk_files_pattern(filebeat_t, filebeat_log_t, filebeat_log_t)
+logging_log_filetrans(filebeat_t, filebeat_log_t, { dir file lnk_file })
+
+manage_dirs_pattern(filebeat_t, filebeat_var_lib_t, filebeat_var_lib_t)
+manage_files_pattern(filebeat_t, filebeat_var_lib_t, filebeat_var_lib_t)
+manage_lnk_files_pattern(filebeat_t, filebeat_var_lib_t, filebeat_var_lib_t)
+files_var_lib_filetrans(filebeat_t, filebeat_var_lib_t, { dir file lnk_file })
+
+auth_use_nsswitch(filebeat_t)
+container_stream_connect(filebeat_t)
+corenet_tcp_connect_http_port(filebeat_t)
+dev_read_sysfs(filebeat_t)
+domain_read_all_domains_state(filebeat_t)
+domain_read_confined_domains_state(filebeat_t)
+domain_search_all_domains_state(filebeat_t)
+fs_read_cgroup_files(filebeat_t)
+fs_search_cgroup_dirs(filebeat_t)
+kernel_list_all_proc(filebeat_t)
+kernel_read_all_proc(filebeat_t)
+logging_read_all_logs(filebeat_t)
+logging_read_audit_log(filebeat_t)
