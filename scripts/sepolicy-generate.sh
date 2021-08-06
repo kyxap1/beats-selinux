@@ -12,8 +12,11 @@ cd ${INSTALL_PATH}
 
 sepolicy generate --name ${APP} --path ${INSTALL_PATH} --init ${APP_BIN}
 
-sed -i '/permissive ${APP}_t;/d' ${APP}.te
+#remove permissive
+sed -i "/permissive ${APP}_t;/d" ${APP}.te
+#fix locale bug with --update
+sed -i 's#+%x %X#+%m/%d/%Y %T#' ${APP}.sh
+# remove sample data
 sed -i '/# This is an example. You will need to change it./d' ${APP}_selinux.spec
 sed -i 's#http://HOSTNAME#https://localhost#g' ${APP}_selinux.spec
 sed -i 's/YOUR NAME <YOUR@EMAILADDRESS>/Selinux <selinux@local>/g' ${APP}_selinux.spec
-sed -i 's#+%x %X#+%m/%d/%Y %T#' ${APP}.sh
