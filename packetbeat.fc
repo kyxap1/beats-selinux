@@ -1,0 +1,9 @@
+/etc/rc\.d/init\.d/packetbeat	--	gen_context(system_u:object_r:packetbeat_initrc_exec_t,s0)
+
+/lib/systemd/system/packetbeat.service		--	gen_context(system_u:object_r:packetbeat_unit_file_t,s0)
+
+/usr/share/packetbeat/bin/packetbeat		--	gen_context(system_u:object_r:packetbeat_exec_t,s0)
+
+/var/lib/packetbeat(/.*)?		gen_context(system_u:object_r:packetbeat_var_lib_t,s0)
+
+/var/log/packetbeat(/.*)?		gen_context(system_u:object_r:packetbeat_log_t,s0)

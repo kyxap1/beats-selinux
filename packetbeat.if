@@ -1,0 +1,270 @@
+## <summary>policy for packetbeat</summary>
+
+########################################
+## <summary>
+##	Execute packetbeat_exec_t in the packetbeat domain.
+## </summary>
+## <param name="domain">
+## <summary>
+##	Domain allowed to transition.
+## </summary>
+## </param>
+#
+interface(`packetbeat_domtrans',`
+	gen_require(`
+		type packetbeat_t, packetbeat_exec_t;
+	')
+
+	corecmd_search_bin($1)
+	domtrans_pattern($1, packetbeat_exec_t, packetbeat_t)
+')
+
+######################################
+## <summary>
+##	Execute packetbeat in the caller domain.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`packetbeat_exec',`
+	gen_require(`
+		type packetbeat_exec_t;
+	')
+
+	corecmd_search_bin($1)
+	can_exec($1, packetbeat_exec_t)
+')
+
+########################################
+## <summary>
+##	Execute packetbeat server in the packetbeat domain.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`packetbeat_initrc_domtrans',`
+	gen_require(`
+		type packetbeat_initrc_exec_t;
+	')
+
+	init_labeled_script_domtrans($1, packetbeat_initrc_exec_t)
+')
+########################################
+## <summary>
+##	Read packetbeat's log files.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <rolecap/>
+#
+interface(`packetbeat_read_log',`
+	gen_require(`
+		type packetbeat_log_t;
+	')
+
+	logging_search_logs($1)
+	read_files_pattern($1, packetbeat_log_t, packetbeat_log_t)
+')
+
+########################################
+## <summary>
+##	Append to packetbeat log files.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`packetbeat_append_log',`
+	gen_require(`
+		type packetbeat_log_t;
+	')
+
+	logging_search_logs($1)
+	append_files_pattern($1, packetbeat_log_t, packetbeat_log_t)
+')
+
+########################################
+## <summary>
+##	Manage packetbeat log files
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`packetbeat_manage_log',`
+	gen_require(`
+		type packetbeat_log_t;
+	')
+
+	logging_search_logs($1)
+	manage_dirs_pattern($1, packetbeat_log_t, packetbeat_log_t)
+	manage_files_pattern($1, packetbeat_log_t, packetbeat_log_t)
+	manage_lnk_files_pattern($1, packetbeat_log_t, packetbeat_log_t)
+')
+
+########################################
+## <summary>
+##	Search packetbeat lib directories.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`packetbeat_search_lib',`
+	gen_require(`
+		type packetbeat_var_lib_t;
+	')
+
+	allow $1 packetbeat_var_lib_t:dir search_dir_perms;
+	files_search_var_lib($1)
+')
+
+########################################
+## <summary>
+##	Read packetbeat lib files.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`packetbeat_read_lib_files',`
+	gen_require(`
+		type packetbeat_var_lib_t;
+	')
+
+	files_search_var_lib($1)
+	read_files_pattern($1, packetbeat_var_lib_t, packetbeat_var_lib_t)
+')
+
+########################################
+## <summary>
+##	Manage packetbeat lib files.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`packetbeat_manage_lib_files',`
+	gen_require(`
+		type packetbeat_var_lib_t;
+	')
+
+	files_search_var_lib($1)
+	manage_files_pattern($1, packetbeat_var_lib_t, packetbeat_var_lib_t)
+')
+
+########################################
+## <summary>
+##	Manage packetbeat lib directories.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`packetbeat_manage_lib_dirs',`
+	gen_require(`
+		type packetbeat_var_lib_t;
+	')
+
+	files_search_var_lib($1)
+	manage_dirs_pattern($1, packetbeat_var_lib_t, packetbeat_var_lib_t)
+')
+
+########################################
+## <summary>
+##	Execute packetbeat server in the packetbeat domain.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed to transition.
+##	</summary>
+## </param>
+#
+interface(`packetbeat_systemctl',`
+	gen_require(`
+		type packetbeat_t;
+		type packetbeat_unit_file_t;
+	')
+
+	systemd_exec_systemctl($1)
+        systemd_read_fifo_file_passwd_run($1)
+	allow $1 packetbeat_unit_file_t:file read_file_perms;
+	allow $1 packetbeat_unit_file_t:service manage_service_perms;
+
+	ps_process_pattern($1, packetbeat_t)
+')
+
+
+########################################
+## <summary>
+##	All of the rules required to administrate
+##	an packetbeat environment
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <param name="role">
+##	<summary>
+##	Role allowed access.
+##	</summary>
+## </param>
+## <rolecap/>
+#
+interface(`packetbeat_admin',`
+	gen_require(`
+		type packetbeat_t;
+		type packetbeat_initrc_exec_t;
+		type packetbeat_log_t;
+		type packetbeat_var_lib_t;
+	type packetbeat_unit_file_t;
+	')
+
+	allow $1 packetbeat_t:process { signal_perms };
+	ps_process_pattern($1, packetbeat_t)
+
+    tunable_policy(`deny_ptrace',`',`
+        allow $1 packetbeat_t:process ptrace;
+    ')
+
+	packetbeat_initrc_domtrans($1)
+	domain_system_change_exemption($1)
+	role_transition $2 packetbeat_initrc_exec_t system_r;
+	allow $2 system_r;
+
+	logging_search_logs($1)
+	admin_pattern($1, packetbeat_log_t)
+
+	files_search_var_lib($1)
+	admin_pattern($1, packetbeat_var_lib_t)
+
+	packetbeat_systemctl($1)
+	admin_pattern($1, packetbeat_unit_file_t)
+	allow $1 packetbeat_unit_file_t:service all_service_perms;
+	optional_policy(`
+		systemd_passwd_agent_exec($1)
+		systemd_read_fifo_file_passwd_run($1)
+	')
+')
