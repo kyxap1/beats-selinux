@@ -1,0 +1,59 @@
+policy_module(metricbeat, 1.0.0)
+
+type metricbeat_t;
+type metricbeat_exec_t;
+init_daemon_domain(metricbeat_t, metricbeat_exec_t)
+
+type metricbeat_initrc_exec_t;
+init_script_file(metricbeat_initrc_exec_t)
+
+type metricbeat_log_t;
+logging_log_file(metricbeat_log_t)
+
+type metricbeat_var_lib_t;
+files_type(metricbeat_var_lib_t)
+
+type metricbeat_unit_file_t;
+systemd_unit_file(metricbeat_unit_file_t)
+
+allow metricbeat_t self:fifo_file rw_fifo_file_perms;
+allow metricbeat_t self:unix_stream_socket create_stream_socket_perms;
+
+manage_dirs_pattern(metricbeat_t, metricbeat_log_t, metricbeat_log_t)
+manage_files_pattern(metricbeat_t, metricbeat_log_t, metricbeat_log_t)
+manage_lnk_files_pattern(metricbeat_t, metricbeat_log_t, metricbeat_log_t)
+logging_log_filetrans(metricbeat_t, metricbeat_log_t, { dir file lnk_file })
+
+manage_dirs_pattern(metricbeat_t, metricbeat_var_lib_t, metricbeat_var_lib_t)
+manage_files_pattern(metricbeat_t, metricbeat_var_lib_t, metricbeat_var_lib_t)
+manage_lnk_files_pattern(metricbeat_t, metricbeat_var_lib_t, metricbeat_var_lib_t)
+files_var_lib_filetrans(metricbeat_t, metricbeat_var_lib_t, { dir file lnk_file })
+
+allow metricbeat_t self:capability { dac_read_search sys_admin };
+allow metricbeat_t self:unix_dgram_socket { connect create getattr setopt };
+dontaudit metricbeat_t self:capability sys_ptrace;
+
+auth_use_nsswitch(metricbeat_t)
+container_stream_connect(metricbeat_t)
+corenet_tcp_connect_http_port(metricbeat_t)
+dev_getattr_fs(metricbeat_t)
+dev_getattr_generic_blk_files(metricbeat_t)
+dev_read_nvme(metricbeat_t)
+dev_read_sysfs(metricbeat_t)
+domain_read_all_domains_state(metricbeat_t)
+domain_read_confined_domains_state(metricbeat_t)
+domain_search_all_domains_state(metricbeat_t)
+domain_use_interactive_fds(metricbeat_t)
+files_read_etc_files(metricbeat_t)
+fs_getattr_dos_fs(metricbeat_t)
+fs_getattr_iso9660_fs(metricbeat_t)
+fs_getattr_xattr_fs(metricbeat_t)
+fs_search_cgroup_dirs(metricbeat_t)
+init_telinit(metricbeat_t)
+kernel_list_all_proc(metricbeat_t)
+kernel_read_all_proc(metricbeat_t)
+miscfiles_read_localization(metricbeat_t)
+storage_getattr_fixed_disk_dev(metricbeat_t)
+storage_getattr_removable_dev(metricbeat_t)
+sysnet_dns_name_resolve(metricbeat_t)
+
