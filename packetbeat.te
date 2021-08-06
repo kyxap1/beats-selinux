@@ -18,6 +18,10 @@ systemd_unit_file(packetbeat_unit_file_t)
 
 allow packetbeat_t self:fifo_file rw_fifo_file_perms;
 allow packetbeat_t self:unix_stream_socket create_stream_socket_perms;
+allow packetbeat_t self:capability { net_raw net_admin };
+allow packetbeat_t self:netlink_netfilter_socket { create read write };
+allow packetbeat_t self:packet_socket { read write create bind getopt ioctl map setopt };
+allow packetbeat_t self:unix_dgram_socket { create ioctl };
 
 manage_dirs_pattern(packetbeat_t, packetbeat_log_t, packetbeat_log_t)
 manage_files_pattern(packetbeat_t, packetbeat_log_t, packetbeat_log_t)
@@ -29,32 +33,16 @@ manage_files_pattern(packetbeat_t, packetbeat_var_lib_t, packetbeat_var_lib_t)
 manage_lnk_files_pattern(packetbeat_t, packetbeat_var_lib_t, packetbeat_var_lib_t)
 files_var_lib_filetrans(packetbeat_t, packetbeat_var_lib_t, { dir file lnk_file })
 
-domain_use_interactive_fds(packetbeat_t)
-files_read_etc_files(packetbeat_t)
 auth_use_nsswitch(packetbeat_t)
-miscfiles_read_localization(packetbeat_t)
-sysnet_dns_name_resolve(packetbeat_t)
-
-require {
-  type packetbeat_t;
-  class capability { net_raw net_admin };
-  class netlink_netfilter_socket { create read write };
-  class packet_socket { bind create ioctl getopt map setopt read write };
-  class unix_dgram_socket { create ioctl };
-}
-
-allow packetbeat_t self:capability { net_raw net_admin };
-allow packetbeat_t self:netlink_netfilter_socket { create read write };
-allow packetbeat_t self:packet_socket { read write create bind getopt ioctl map setopt };
-allow packetbeat_t self:unix_dgram_socket { create ioctl };
-
-init_read_state(packetbeat_t)
 container_stream_connect(packetbeat_t)
 corenet_tcp_connect_http_port(packetbeat_t)
 dev_list_sysfs(packetbeat_t)
 dev_read_sysfs(packetbeat_t)
+domain_use_interactive_fds(packetbeat_t)
 fs_read_cgroup_files(packetbeat_t)
 fs_search_cgroup_dirs(packetbeat_t)
-kernel_read_system_state(packetbeat_t)
+init_read_state(packetbeat_t)
 kernel_read_network_state(packetbeat_t)
+kernel_read_system_state(packetbeat_t)
 kernel_request_load_module(packetbeat_t)
+sysnet_dns_name_resolve(packetbeat_t)

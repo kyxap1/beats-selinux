@@ -19,7 +19,6 @@ systemd_unit_file(filebeat_unit_file_t)
 allow filebeat_t self:fifo_file rw_fifo_file_perms;
 allow filebeat_t self:unix_stream_socket create_stream_socket_perms;
 allow filebeat_t self:capability { dac_override dac_read_search };
-dontaudit filebeat_t self:capability sys_ptrace;
 
 manage_dirs_pattern(filebeat_t, filebeat_log_t, filebeat_log_t)
 manage_files_pattern(filebeat_t, filebeat_log_t, filebeat_log_t)
